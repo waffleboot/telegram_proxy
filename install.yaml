@@ -1,0 +1,53 @@
+- hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - raw: apt update && apt install -y python
+    - apt:
+        pkg:
+          - ansible
+          - build-essential
+          - libssl-dev
+          - zlib1g-dev
+          - curl
+          - git
+    - git:
+        repo: https://github.com/TelegramMessenger/MTProxy
+        depth: 1
+        dest: MTProxy
+    - shell: cd MTProxy && make
+    - shell: head -c 16 /dev/urandom | xxd -ps
+      register: output
+    - debug:
+        msg: "tg://proxy?server={{public_master_ip}}&port=443&secret={{output.stdout_lines[0]}}"
+    - copy:
+        dest: start.sh
+        mode: "u+x"
+        content: |
+          #!/bin/bash
+          curl -s https://core.telegram.org/getProxySecret -o proxy-secret
+          curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
+          /home/ubuntu/MTProxy/objs/bin/mtproto-proxy -u nobody -p 8888 -H 443 -S {{output.stdout_lines[0]}} --aes-pwd proxy-secret proxy-multi.conf -M 1
+    - copy:
+        dest: /etc/systemd/system/mtproxy.service
+        content: |
+          [Unit]
+          Description=MTProxy
+          After=multi-user.target
+          
+          [Service]
+          Type=simple
+          ExecStart=/bin/bash /home/ubuntu/start.sh
+          Restart=always
+          RestartSec=30
+          
+          [Install]
+          WantedBy=multi-user.target
+    - systemd:
+        name: mtproxy
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+    - cron:
+        job: "systemctl restart mtproxy"
+        minute: "0"
