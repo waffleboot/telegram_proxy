@@ -1,8 +1,12 @@
 - hosts: all
-  gather_facts: yes
+  gather_facts: no
   become: yes
   tasks:
     - raw: apt update && apt install -y python
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
     - apt:
         pkg:
           - ansible
