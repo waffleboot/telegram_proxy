@@ -1,5 +1,5 @@
 - hosts: all
-  gather_facts: no
+  gather_facts: yes
   become: yes
   tasks:
     - raw: apt update && apt install -y python
@@ -27,7 +27,7 @@
           #!/bin/bash
           curl -s https://core.telegram.org/getProxySecret -o proxy-secret
           curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
-          /home/ubuntu/MTProxy/objs/bin/mtproto-proxy -u nobody -p 8888 -H 443 -S {{output.stdout_lines[0]}} --aes-pwd proxy-secret proxy-multi.conf -M 1 --http-stats
+          /home/ubuntu/MTProxy/objs/bin/mtproto-proxy -u nobody -H 443 -S {{output.stdout_lines[0]}} --aes-pwd proxy-secret proxy-multi.conf -M 5 --nat-info {{ hostvars['master']['ansible_default_ipv4']['address'] }}:{{public_master_ip}}
     - copy:
         dest: /etc/systemd/system/mtproxy.service
         content: |
