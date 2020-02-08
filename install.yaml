@@ -2,11 +2,9 @@
   gather_facts: no
   become: yes
   tasks:
+    - wait_for_connection:
     - raw: apt update && apt install -y python
-- hosts: all
-  gather_facts: yes
-  become: yes
-  tasks:
+    - setup:
     - apt:
         pkg:
           - ansible

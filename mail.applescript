@@ -19,8 +19,6 @@ on run argv
 			
 		end tell
 		
-		quit
-		
 	end tell
-	
+
 end run
