@@ -16,14 +16,12 @@
           - curl
           - git
     - git:
-        repo: https://github.com/TelegramMessenger/MTProxy
+        repo: https://github.com/waffleboot/MTProxy
         depth: 1
         dest: MTProxy
     - shell: cd MTProxy && make
-    - shell: head -c 16 /dev/urandom | xxd -ps
-      register: output
     - debug:
-        msg: "tg://proxy?server={{public_master_ip}}&port=443&secret={{output.stdout_lines[0]}}"
+        msg: "tg://proxy?server={{public_master_ip}}&port=443&secret={{token}}"
     - copy:
         dest: start.sh
         mode: "u+x"
@@ -31,7 +29,7 @@
           #!/bin/bash
           curl -s https://core.telegram.org/getProxySecret -o proxy-secret
           curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
-          /home/ubuntu/MTProxy/objs/bin/mtproto-proxy -u nobody -H 443 -S {{output.stdout_lines[0]}} --aes-pwd proxy-secret proxy-multi.conf -M 5 --nat-info {{ hostvars['master']['ansible_default_ipv4']['address'] }}:{{public_master_ip}}
+          /home/ubuntu/MTProxy/objs/bin/mtproto-proxy -u nobody -H 443 -S {{token}} --aes-pwd proxy-secret proxy-multi.conf -M 5 --nat-info {{ hostvars['master']['ansible_default_ipv4']['address'] }}:{{public_master_ip}}
     - copy:
         dest: /etc/systemd/system/mtproxy.service
         content: |
