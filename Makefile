@@ -11,21 +11,28 @@ all: apply mail python install
 docker_run = docker run --rm -it -w /opt -v ${PWD}:/opt -v ~/.aws:/root/.aws
 
 apply:
-	${docker_run} --name terraform yangand/kubernetes_terraform terraform apply -auto-approve
-	$(MAKE) ssh_config
-	head -c 16 /dev/urandom | xxd -ps > token
+	@echo create aws infrastructure
+	@${docker_run} --name terraform yangand/kubernetes_terraform terraform apply -auto-approve
+	@$(MAKE) ssh_config
+	@echo generate token
+	@head -c 16 /dev/urandom | xxd -ps > token
 
 destroy:
-	${docker_run} --name terraform yangand/kubernetes_terraform terraform destroy -auto-approve
+	@echo destroy aws infrastructure
+	@${docker_run} --name terraform yangand/kubernetes_terraform terraform destroy -auto-approve
 
 mail:
-	osascript mail.applescript $(public_master_ip) $(token) $(mailto) &
+	@echo send mail
+	@osascript mail.applescript $(public_master_ip) $(token) $(mailto) &
 
 python:
-	${docker_run} yangand/kubernetes_ansible ansible-playbook --extra-vars public_master_ip=$(public_master_ip) --extra-vars token=$(token) -i inventory.yaml python.yaml
+	@echo install ansible
+	@${docker_run} yangand/kubernetes_ansible ansible-playbook --extra-vars public_master_ip=$(public_master_ip) --extra-vars token=$(token) -i inventory.yaml python.yaml
 
 install:
-	${docker_run} yangand/kubernetes_ansible ansible-playbook --extra-vars public_master_ip=$(public_master_ip) --extra-vars token=$(token) -i inventory.yaml install.yaml
+	@echo install mtproxy
+	@${docker_run} yangand/kubernetes_ansible ansible-playbook --extra-vars public_master_ip=$(public_master_ip) --extra-vars token=$(token) -i inventory.yaml install.yaml
 
 ssh_config:
-	~/go/bin/ssh_config ~/.ssh master $(public_master_ip) ubuntu ~/.aws/id_rsa_master
+	@echo update .ssh/config
+	@~/go/bin/ssh_config ~/.ssh master $(public_master_ip) ubuntu ~/.aws/id_rsa_master
