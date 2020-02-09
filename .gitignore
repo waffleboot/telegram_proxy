@@ -3,3 +3,4 @@
 public_master_ip
 *.tfstate*
 mail
+token

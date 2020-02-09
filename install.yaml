@@ -1,10 +1,6 @@
 - hosts: all
-  gather_facts: no
   become: yes
   tasks:
-    - wait_for_connection:
-    - raw: apt update && apt install -y python
-    - setup:
     - apt:
         pkg:
           - ansible
@@ -19,7 +15,7 @@
         dest: MTProxy
     - shell: cd MTProxy && make
     - debug:
-        msg: "tg://proxy?server={{public_master_ip}}&port=443&secret={{token}}"
+        msg: "tg://proxy?server={{ansible_host}}&port=443&secret={{token}}"
     - copy:
         dest: start.sh
         mode: "u+x"
@@ -27,7 +23,7 @@
           #!/bin/bash
           curl -s https://core.telegram.org/getProxySecret -o proxy-secret
           curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
-          /home/ubuntu/MTProxy/objs/bin/mtproto-proxy -u nobody -H 443 -S {{token}} --aes-pwd proxy-secret proxy-multi.conf -M 5 --nat-info {{ hostvars['master']['ansible_default_ipv4']['address'] }}:{{public_master_ip}}
+          /home/ubuntu/MTProxy/objs/bin/mtproto-proxy -u nobody -H 443 -S {{token}} --aes-pwd proxy-secret proxy-multi.conf -M 5 --nat-info {{ hostvars['master']['ansible_default_ipv4']['address'] }}:{{ansible_host}}
     - copy:
         dest: /etc/systemd/system/mtproxy.service
         content: |
