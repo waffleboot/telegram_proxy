@@ -6,7 +6,12 @@ token = $(shell cat token)
 
 .PHONY: mail open
 
-all: apply mail python install
+all:
+	@if ssh -i ~/.aws/id_rsa_master -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@$(public_master_ip) -p 22 echo ok 2>&1; then \
+		$(MAKE) destroy;                   \
+	else                                    \
+		$(MAKE) apply mail python install; \
+	fi
 
 docker_run = docker run --rm -it -w /opt -v ${PWD}:/opt -v ~/.aws:/root/.aws
 
