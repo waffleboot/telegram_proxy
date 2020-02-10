@@ -4,7 +4,7 @@ mailto = $(shell cat mail)
 
 token = $(shell cat token)
 
-.PHONY: mail
+.PHONY: mail open
 
 all: apply mail python install
 
@@ -24,6 +24,9 @@ destroy:
 mail:
 	@echo send mail
 	@osascript mail.applescript $(public_master_ip) $(token) $(mailto) &
+
+open:
+	@open "tg://proxy?server=$(public_master_ip)&port=443&secret=$(token)"
 
 python:
 	@echo install ansible
