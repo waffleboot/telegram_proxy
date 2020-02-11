@@ -13,17 +13,11 @@
         repo: https://github.com/waffleboot/MTProxy
         depth: 1
         dest: MTProxy
-    - shell: cd MTProxy && make
+    - command:
+        chdir: MTProxy
+        cmd: make
     - debug:
         msg: "tg://proxy?server={{ansible_host}}&port=443&secret={{token}}"
-    - copy:
-        dest: start.sh
-        mode: "u+x"
-        content: |
-          #!/bin/bash
-          curl -s https://core.telegram.org/getProxySecret -o proxy-secret
-          curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
-          /home/ubuntu/MTProxy/objs/bin/mtproto-proxy -u nobody -H 443 -S {{token}} --aes-pwd proxy-secret proxy-multi.conf -M 5 --nat-info {{ hostvars['master']['ansible_default_ipv4']['address'] }}:{{ansible_host}}
     - copy:
         dest: /etc/systemd/system/mtproxy.service
         content: |
@@ -32,8 +26,9 @@
           After=multi-user.target
           
           [Service]
-          Type=simple
-          ExecStart=/bin/bash /home/ubuntu/start.sh
+          ExecStartPre=/usr/bin/curl -s https://core.telegram.org/getProxySecret -o /tmp/proxy-secret
+          ExecStartPre=/usr/bin/curl -s https://core.telegram.org/getProxyConfig -o /tmp/proxy-multi.conf
+          ExecStart=/home/ubuntu/MTProxy/objs/bin/mtproto-proxy -u nobody -H 443 -S {{token}} --aes-pwd /tmp/proxy-secret /tmp/proxy-multi.conf -M 5 --nat-info {{ hostvars['master']['ansible_default_ipv4']['address'] }}:{{ansible_host}}
           Restart=always
           RestartSec=30
           
