@@ -8,4 +8,9 @@
           :;
         done
       delegate_to: localhost
-    - raw: apt update && apt install -y python
+    - raw: |
+        until apt update;
+        do
+          sleep 1;
+        done
+    - raw: apt install -y python
