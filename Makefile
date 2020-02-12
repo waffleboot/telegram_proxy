@@ -21,7 +21,6 @@ create:
 	@$(MAKE) ssh_config
 	@echo generate token
 	@head -c 16 /dev/urandom | xxd -ps > token
-	@echo "tg://proxy?server=$(public_master_ip)&port=443&secret=$(token)"
 
 install: mail python mtproxy
 
