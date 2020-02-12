@@ -1,6 +1,8 @@
 - hosts: all
   become: yes
   tasks:
+    - debug:
+        msg: "tg://proxy?server={{ansible_host}}&port=443&secret={{token}}"
     - apt:
         pkg:
           - ansible
@@ -16,8 +18,6 @@
     - command:
         chdir: MTProxy
         cmd: make
-    - debug:
-        msg: "tg://proxy?server={{ansible_host}}&port=443&secret={{token}}"
     - copy:
         dest: /etc/systemd/system/mtproxy.service
         content: |
