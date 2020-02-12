@@ -16,8 +16,6 @@
     - command:
         chdir: MTProxy
         cmd: make
-    - debug:
-        msg: "tg://proxy?server={{ansible_host}}&port=443&secret={{token}}"
     - copy:
         dest: /etc/systemd/system/mtproxy.service
         content: |
