@@ -46,3 +46,6 @@ mtproxy:
 ssh_config:
 	@echo update .ssh/config
 	@~/go/bin/ssh_config ~/.ssh master $(public_master_ip) ubuntu ~/.aws/id_rsa_master
+
+print:
+	@echo "tg://proxy?server=$(public_master_ip)&port=443&secret=$(token)"
