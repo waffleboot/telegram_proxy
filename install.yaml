@@ -13,10 +13,11 @@
           - git
     - git:
         repo: https://github.com/waffleboot/MTProxy
-        depth: 1
         dest: MTProxy
+        depth: 1
     - command:
         chdir: MTProxy
+        creates: /home/ubuntu/MTProxy/objs/bin/mtproto-proxy
         cmd: make
     - copy:
         dest: /etc/systemd/system/mtproxy.service
