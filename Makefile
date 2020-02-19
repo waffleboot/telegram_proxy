@@ -22,7 +22,7 @@ create:
 	@echo generate token
 	@head -c 16 /dev/urandom | xxd -ps > token
 
-install: mail python mtproxy
+install: python mtproxy mail
 
 destroy:
 	@echo destroy aws infrastructure
