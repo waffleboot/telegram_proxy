@@ -13,7 +13,7 @@ all:
 		$(MAKE) create install; \
 	fi
 
-docker_run = docker run --rm -it --init -w "$$(pwd)" -v "$$(pwd)":"$$(pwd)" -v ~/.aws:/root/.aws
+docker_run = docker run --rm -it --init -w "$$(pwd)" -v "$$(pwd)":"$$(pwd)":delegated -v ~/.aws:/root/.aws --net host
 
 create:
 	@echo create aws infrastructure
