@@ -43,5 +43,3 @@
     - cron:
         job: "systemctl restart mtproxy"
         minute: "0"
-    - shell: echo 'echo -e "\\033]1337;SetProfile=Prod\\a"' >> /home/ubuntu/.bashrc
-    - shell: echo 'echo -e "\\033]1337;SetProfile=Default\\a"' >> /home/ubuntu/.bash_logout

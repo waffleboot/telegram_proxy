@@ -20,9 +20,9 @@
         - name: apt install python
           no_log: True
           raw: |
-            for i in {1..5}
+            for i in {1..50}
             do
-              apt install -y python 2>apt_install_python.log;
+              apt install -y make python gcc 2>apt_install_python.log;
               status=$?
               if [ $status -eq 0 ]
               then
@@ -35,3 +35,10 @@
         - command: cat apt_install_python.log
           register: log
         - debug: msg="{{log.stdout_lines}}"
+    - lineinfile:
+        line: echo -e "\\033]1337;SetProfile=Prod\\a"
+        path: /home/ubuntu/.bashrc
+    - lineinfile:
+        line: echo -e "\\033]1337;SetProfile=Default\\a"
+        path: /home/ubuntu/.bash_logout
+    - shell: rm apt_install_python.log
